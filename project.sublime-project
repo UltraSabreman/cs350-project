@@ -1,0 +1,17 @@
+{
+    "folders":
+    [
+        {
+            "path": "src"
+        },
+    ],
+    "build_systems":
+    [
+        {
+            "selector": "source.lua",
+            "name": "LUA",
+            "cmd": ["love", "$file_path"],
+            "shell": true
+        }
+    ]
+}
