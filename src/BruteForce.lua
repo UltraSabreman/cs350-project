@@ -4,58 +4,10 @@
 		+ Skipping identical points]]
 
 Brute = {}
-Brute.DoneComputing = false
-Brute.checkTable = {} --Used to check if the current set of points has already been calcualted.
-Brute.finalHull = {}
-Brute.visitedPoints = {}
-Brute.curLine = {}
-
---Runs through the entire set of points using the given line
-function Brute.isBoundry(LineStart, LineEnd)
-	local prevSide = 0
-	local isInitilized = false
-
-	for _,p in pairs(points) do
-		local curSide = relativeToLine(LineStart, LineEnd, p)
-
-		if not isInitilized then
-			prevSide = curSide
-			isInitilized = true
-		else
-			if prevSide ~= 0 and curSide ~= 0 and curSide ~= prevSide then
-				return false
-			elseif prevSide == 0 then
-				prevSide = curSide
-			end
-		end 
-	end
-	return true
-end
-
---actualy computes stuff, uses coroutines to return run in background (LUA threading)
-function Brute.findHull()
-	local i = 1
-	Brute.DoneComputing = false;
-
-	for _,p1 in pairs(points) do
-		Brute.visitedPoints[_] = p1
-		for l,p2 in pairs(points) do
-			if p1 ~= p2 and not Brute.hasLine(p1, p2) then
-				Brute.setLine(p1, p2)
-				Brute.curLine = {p1, p2}
-
-				if Brute.isBoundry(p1, p2) then
-					Brute.finalHull[i] = {p1, p2} 
-					i = i + 1
-				end
-				coroutine.yield()
-			end
-		end
-	end
-
-	Brute.curLine = nil
-	Brute.DoneComputing = true
-end
+Brute.checkTable = {} 		--Used to check if the current set of points has already been calcualted.
+Brute.finalHull = {}		--Stores the lines that make up the final hull
+Brute.visitedPoints = {}	--stores all the points as we search from them so we can see how much we've done already
+Brute.curLine = {}			--stores the current check line
 
 
 function Brute.Draw() 
@@ -84,6 +36,53 @@ function Brute.Draw()
 		love.graphics.setColor(50,255,0,255)
 		love.graphics.line(Brute.curLine[1].x, Brute.curLine[1].y, Brute.curLine[2].x, Brute.curLine[2].y)
 	end
+end
+
+--Runs through the entire set of points using the given line
+-- and checks to see if they are all on one side of it.
+function Brute.isBoundry(LineStart, LineEnd)
+	local prevSide = 0
+	local isInitilized = false
+
+	for _,p in pairs(points) do
+		local curSide = relativeToLine(LineStart, LineEnd, p)
+
+		if not isInitilized then
+			prevSide = curSide
+			isInitilized = true
+		else
+			if prevSide ~= 0 and curSide ~= 0 and curSide ~= prevSide then
+				return false
+			elseif prevSide == 0 then
+				prevSide = curSide
+			end
+		end 
+	end
+	return true
+end
+
+--runs through all points for each point, checking to see if the line that they make
+--has all the rest of the points on one side of it
+function Brute.findHull()
+	local i = 1
+
+	for _,p1 in pairs(points) do
+		Brute.visitedPoints[_] = p1
+		for l,p2 in pairs(points) do
+			if p1 ~= p2 and not Brute.hasLine(p1, p2) then
+				Brute.setLine(p1, p2)
+				Brute.curLine = {p1, p2}
+
+				if Brute.isBoundry(p1, p2) then
+					Brute.finalHull[i] = {p1, p2} 
+					i = i + 1
+				end
+				coroutine.yield()
+			end
+		end
+	end
+
+	Brute.curLine = nil
 end
 
 --checks to see if line exhists

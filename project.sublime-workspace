@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"tri",
+				"triLines"
+			],
+			[
 				"cur",
 				"curLine"
 			],
@@ -115,7 +119,7 @@
 			"file": "src/BruteForce.lua",
 			"settings":
 			{
-				"buffer_size": 2698,
+				"buffer_size": 2891,
 				"line_ending": "Windows"
 			}
 		},
@@ -123,7 +127,7 @@
 			"file": "src/QuickHull.lua",
 			"settings":
 			{
-				"buffer_size": 5613,
+				"buffer_size": 7951,
 				"line_ending": "Windows"
 			}
 		},
@@ -308,6 +312,8 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"triLines",
+			"curLine",
 			"vector",
 			"%\\\\",
 			"ValidEntity",
@@ -325,6 +331,8 @@
 		"regex": false,
 		"replace_history":
 		[
+			"excludedCheckLines",
+			"startSplit",
 			"IsValid",
 			".",
 			"\""
@@ -338,7 +346,7 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -367,7 +375,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
@@ -376,15 +384,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2698,
+						"buffer_size": 2891,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2260,
-								2260
+								1460,
+								1460
 							]
 						],
 						"settings":
@@ -393,10 +401,10 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 855.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
@@ -405,15 +413,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5613,
+						"buffer_size": 7951,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								5391,
-								5391
+								477,
+								477
 							]
 						],
 						"settings":
@@ -422,10 +430,10 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2520.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
@@ -453,7 +461,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 3,
 					"type": "text"
 				}
 			]
@@ -501,7 +509,7 @@
 	"project": "project.sublime-project",
 	"replace":
 	{
-		"height": 40.0
+		"height": 62.0
 	},
 	"save_all_on_build": true,
 	"select_file":
