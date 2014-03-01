@@ -9,43 +9,58 @@ end
 
 args = {...}
 points = {}
+height = love.window.getHeight()
+width  = love.window.getWidth()
 
-local height = love.window.getHeight()
-local width  = love.window.getWidth()
-local numOfPoints = tonumber(args[0]) or 30
-local co
+local numOfPoints = tonumber(args[0]) or 100
+local BruteCoroutine, QuickCoroutine
+
 
 function love.load() 
-	--circlePoints(200)
-	randPoints()
-	--co = coroutine.create(Brute.findHull)
-	co = coroutine.create(Quick.findHull)
+	Brute.onLoad()
+	Quick.onLoad()
+
+	circlePoints(190)
+	--randPoints()
+
+	BruteCoroutine = coroutine.create(Brute.findHull)
+	QuickCoroutine = coroutine.create(Quick.findHull)
 end
 
 function love.update()
-	if coroutine.status(co) ~= "dead" then
-		local errorfree, value = coroutine.resume(co)
-	end
+	if coroutine.status(BruteCoroutine) ~= "dead" then coroutine.resume(BruteCoroutine)	end
+	if coroutine.status(QuickCoroutine) ~= "dead" then coroutine.resume(QuickCoroutine)	end
 end
 
 function love.draw()
 	--draws the points
+	love.graphics.setBlendMode('alpha')
 	love.graphics.setLineStyle("smooth")
 	love.graphics.setLineWidth(1)
-	--Brute.Draw()
-	Quick.Draw()
-end
+	love.graphics.setColor(255,255,255,255)
 
+	Brute.Draw()
+	Quick.Draw()
+
+	love.graphics.setColor(255,255,255,255)
+	love.graphics.setBlendMode('premultiplied')
+	if Brute.canvas ~= nil then	love.graphics.draw(Brute.canvas, 0, 0) end
+	if Quick.canvas ~= nil then	love.graphics.draw(Quick.canvas, 400, 0) end
+
+	love.graphics.setBlendMode('alpha')
+	love.graphics.setColor(255,255,255,255)
+	love.graphics.line(width/2, 0, width/2, height)
+end
 --generates the points in a perfect circle
 function circlePoints(radius)
 	local angStep = (math.pi * 2) / numOfPoints
 	local curAng = angStep
 	for i = 1, numOfPoints do
-		local x = (width / 2) + math.sin(curAng) * radius
-		local y = (height / 2) + math.cos(curAng) * radius
+		local x = ((width - 10) / 4) + math.sin(curAng) * radius
+		local y = ((height - 10) / 2) + math.cos(curAng) * radius
 		curAng = curAng + angStep
 
-		points[i] = Vector.new(x, y)
+		points[#points + 1] = Vector.new(x, y)
 	end
 end
 
@@ -53,9 +68,9 @@ end
 function randPoints() 
 	math.randomseed(os.time())
 	for i = 1, numOfPoints do
-		temp = Vector.new(math.random(0, width - 10), math.random(0, height - 10))
+		temp = Vector.new(math.random(0, (width / 2) - 10), math.random(0, height - 10))
 
-		points[i] = temp
+		points[#points + 1] = temp
 	end
 end
 

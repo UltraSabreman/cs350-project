@@ -6,44 +6,51 @@ Quick.checkLines = {}			--stores all lines that make up the check triangles
 Quick.excludedPoints = {}		--stores all points that are excluded, so we don't check them again
 Quick.excludedCheckLines = {}	--this is used to make sure the triangle lines aren't drawn more then once.
 Quick.startSplit = nil 			--stores the line that's used to make the first split.
+Quick.canvas = nil 				--framebufer
 
 function Quick.Draw()
-	for _,p in pairs(points) do
-		love.graphics.setColor(255,0,0,255)
-		love.graphics.rectangle("fill", p.x-1, p.y-1, 3, 3)	
-		if Quick.excludedPoints ~= nil and Quick.excludedPoints[tostring(p)] ~= nil then
-			love.graphics.setColor(0,0,255,255)
+	if Quick.canvas == nil then return end
+	love.graphics.setCanvas(Quick.canvas)
+        Quick.canvas:clear()
+        --love.graphics.setBlendMode('alpha')
+
+		for _,p in pairs(points) do
+			love.graphics.setColor(255,0,0,255)
+			love.graphics.rectangle("fill", p.x-1, p.y-1, 3, 3)	
+			if Quick.excludedPoints ~= nil and Quick.excludedPoints[tostring(p)] ~= nil then
+				love.graphics.setColor(0,0,255,255)
+				love.graphics.rectangle("fill", p.x-1, p.y-1, 3, 3)	
+			end
+		end
+
+		--highlights visited points in green
+		love.graphics.setColor(0,255,0,255)
+		for _,p in pairs(Quick.visitedPoints) do
 			love.graphics.rectangle("fill", p.x-1, p.y-1, 3, 3)	
 		end
-	end
 
-	--highlights visited points in green
-	love.graphics.setColor(0,255,0,255)
-	for _,p in pairs(Quick.visitedPoints) do
-		love.graphics.rectangle("fill", p.x-1, p.y-1, 3, 3)	
-	end
+		--draws the final hull lines, highlights the points as they get computed
+		for _,p in pairs(Quick.finalHull) do
+			love.graphics.setColor(0,150,150,255)
+			love.graphics.line(p[1].x, p[1].y, p[2].x, p[2].y)
+			love.graphics.setColor(255,255,0,255)
+			love.graphics.rectangle("fill", p[1].x-1, p[1].y-1, 3, 3)	
+			love.graphics.rectangle("fill", p[2].x-1, p[2].y-1, 3, 3)	
+		end
 
-	--draws the final hull lines, highlights the points as they get computed
-	for _,p in pairs(Quick.finalHull) do
-		love.graphics.setColor(0,150,150,255)
-		love.graphics.line(p[1].x, p[1].y, p[2].x, p[2].y)
-		love.graphics.setColor(255,255,0,255)
-		love.graphics.rectangle("fill", p[1].x-1, p[1].y-1, 3, 3)	
-		love.graphics.rectangle("fill", p[2].x-1, p[2].y-1, 3, 3)	
-	end
-
-	--draw the trinagles as they are computed
-	love.graphics.setColor(0,255,0,50)
-	for _,p in pairs(Quick.checkLines) do
-		love.graphics.line(p[1].x, p[1].y, p[2].x, p[2].y)
-	end
+		--draw the trinagles as they are computed
+		love.graphics.setColor(0,255,0,50)
+		for _,p in pairs(Quick.checkLines) do
+			love.graphics.line(p[1].x, p[1].y, p[2].x, p[2].y)
+		end
 
 
-	--draws the starting split
-	if Quick.startSplit ~= nil then
-		love.graphics.setColor(255,0,0,255)
-		love.graphics.line(Quick.startSplit[1].x, Quick.startSplit[1].y, Quick.startSplit[2].x, Quick.startSplit[2].y)
-	end
+		--draws the starting split
+		if Quick.startSplit ~= nil then
+			love.graphics.setColor(255,0,0,255)
+			love.graphics.line(Quick.startSplit[1].x, Quick.startSplit[1].y, Quick.startSplit[2].x, Quick.startSplit[2].y)
+		end
+	love.graphics.setCanvas()
 end
 
 --Finds two points, one with the largest x coordinate, and one with the smallest
@@ -148,6 +155,11 @@ function Quick.getNewPoints(pointList, line, side)
 
 	return newPoints, badPoints
 end
+
+function Quick.onLoad()
+    Quick.canvas = love.graphics.newCanvas(width/2, height)  
+end
+
 
 --wrapper function for the recursive one, inits all the appropriate stuff
 function Quick.findHull() 

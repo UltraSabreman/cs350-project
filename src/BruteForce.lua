@@ -8,34 +8,45 @@ Brute.checkTable = {} 		--Used to check if the current set of points has already
 Brute.finalHull = {}		--Stores the lines that make up the final hull
 Brute.visitedPoints = {}	--stores all the points as we search from them so we can see how much we've done already
 Brute.curLine = {}			--stores the current check line
+Brute.canvas = nil 			--The framebuffer
 
 
 function Brute.Draw() 
-	love.graphics.setColor(255,0,0,255)
-	for _,p in pairs(points) do
-		love.graphics.rectangle("fill", p.x-1, p.y-1, 3, 3)	
-	end
+	if Brute.canvas == nil then return end
+	love.graphics.setCanvas(Brute.canvas)
+        Brute.canvas:clear()
+        love.graphics.setBlendMode('alpha')
 
-	--highlights visited points in green
-	love.graphics.setColor(0,255,0,255)
-	for _,p in pairs(Brute.visitedPoints) do
-		love.graphics.rectangle("fill", p.x-1, p.y-1, 3, 3)	
-	end
+        love.graphics.setColor(0, 0, 0, 255)
+        love.graphics.rectangle('fill', 0, 0, width/2, height)
+        
 
-	--draws the final hull lines, highlights the points as they get computed
-	for _,p in pairs(Brute.finalHull) do
-		love.graphics.setColor(0,150,150,255)
-		love.graphics.line(p[1].x, p[1].y, p[2].x, p[2].y)
-		love.graphics.setColor(255,255,0,255)
-		love.graphics.rectangle("fill", p[1].x-1, p[1].y-1, 3, 3)	
-		love.graphics.rectangle("fill", p[2].x-1, p[2].y-1, 3, 3)	
-	end
+		love.graphics.setColor(255,0,0,255)
+		for _,p in pairs(points) do
+			love.graphics.rectangle("fill", p.x-1, p.y-1, 3, 3)	
+		end
 
-	--draws the current comparrison line
-	if Brute.curLine ~= nil then
-		love.graphics.setColor(50,255,0,255)
-		love.graphics.line(Brute.curLine[1].x, Brute.curLine[1].y, Brute.curLine[2].x, Brute.curLine[2].y)
-	end
+		--highlights visited points in green
+		love.graphics.setColor(0,255,0,255)
+		for _,p in pairs(Brute.visitedPoints) do
+			love.graphics.rectangle("fill", p.x-1, p.y-1, 3, 3)	
+		end
+
+		--draws the final hull lines, highlights the points as they get computed
+		for _,p in pairs(Brute.finalHull) do
+			love.graphics.setColor(0,150,150,255)
+			love.graphics.line(p[1].x, p[1].y, p[2].x, p[2].y)
+			love.graphics.setColor(255,255,0,255)
+			love.graphics.rectangle("fill", p[1].x-1, p[1].y-1, 3, 3)	
+			love.graphics.rectangle("fill", p[2].x-1, p[2].y-1, 3, 3)	
+		end
+
+		--draws the current comparrison line
+		if Brute.curLine ~= nil then
+			love.graphics.setColor(50,255,0,255)
+			love.graphics.line(Brute.curLine[1].x, Brute.curLine[1].y, Brute.curLine[2].x, Brute.curLine[2].y)
+		end
+	love.graphics.setCanvas()
 end
 
 --Runs through the entire set of points using the given line
@@ -59,6 +70,10 @@ function Brute.isBoundry(LineStart, LineEnd)
 		end 
 	end
 	return true
+end
+
+function Brute.onLoad()
+    Brute.canvas = love.graphics.newCanvas(width/2, height)  
 end
 
 --runs through all points for each point, checking to see if the line that they make
