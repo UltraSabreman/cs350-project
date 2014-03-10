@@ -7,17 +7,58 @@ Quick.excludedPoints = {}		--stores all points that are excluded, so we don't ch
 Quick.excludedCheckLines = {}	--this is used to make sure the triangle lines aren't drawn more then once.
 Quick.startSplit = nil 			--stores the line that's used to make the first split.
 Quick.canvas = nil 				--framebufer
+Quick.points = {}
+Quick.num = -1
+Quick.__index = Quick
 
-function Quick.Draw()
-	if Quick.canvas == nil then return end
-	love.graphics.setCanvas(Quick.canvas)
-        Quick.canvas:clear()
+
+function Quick.new(ps, num)
+	local self = setmetatable({}, Quick)
+	self.canvas = love.graphics.newCanvas(width/2, height)  
+	self.finalHull = {}
+	self.visitedPoints = {}
+	self.checkLines = {}
+	self.excludedPoints = {}
+	self.excludedCheckLines = {}
+	self.startSplit = nil
+	self.num = num
+	self.points = ps	
+	return self
+end
+
+function Quick:Reset()
+	self.canvas = love.graphics.newCanvas(width/2, height)  
+	self.finalHull = {}
+	self.visitedPoints = {}
+	self.checkLines = {}
+	self.excludedPoints = {}
+	self.excludedCheckLines = {}
+	self.startSplit = nil
+end
+
+function Quick:ClearAll()
+	self.canvas = nil
+	self.finalHull = nil
+	self.visitedPoints = nil
+	self.checkLines = nil
+	self.excludedPoints = nil
+	self.excludedCheckLines = nil
+	self.startSplit = nil
+	self.num = nil
+	self.points = nil
+end
+
+
+function Quick:Draw()
+	if self.canvas == nil then return end
+	love.graphics.setCanvas(self.canvas)
+        self.canvas:clear()
         --love.graphics.setBlendMode('alpha')
 
 		for _,p in pairs(points) do
 			love.graphics.setColor(255,0,0,255)
 			love.graphics.rectangle("fill", p.x-1, p.y-1, 3, 3)	
-			if Quick.excludedPoints ~= nil and Quick.excludedPoints[tostring(p)] ~= nil then
+			if self.excludedPoints ~= nil and self.excludedPoints[tostring(p)] ~= nil then
 				love.graphics.setColor(0,0,255,255)
 				love.graphics.rectangle("fill", p.x-1, p.y-1, 3, 3)	
 			end
@@ -25,12 +66,12 @@ function Quick.Draw()
 
 		--highlights visited points in green
 		love.graphics.setColor(0,255,0,255)
-		for _,p in pairs(Quick.visitedPoints) do
+		for _,p in pairs(self.visitedPoints) do
 			love.graphics.rectangle("fill", p.x-1, p.y-1, 3, 3)	
 		end
 
 		--draws the final hull lines, highlights the points as they get computed
-		for _,p in pairs(Quick.finalHull) do
+		for _,p in pairs(self.finalHull) do
 			love.graphics.setColor(0,150,150,255)
 			love.graphics.line(p[1].x, p[1].y, p[2].x, p[2].y)
 			love.graphics.setColor(255,255,0,255)
@@ -40,22 +81,22 @@ function Quick.Draw()
 
 		--draw the trinagles as they are computed
 		love.graphics.setColor(0,255,0,50)
-		for _,p in pairs(Quick.checkLines) do
+		for _,p in pairs(self.checkLines) do
 			love.graphics.line(p[1].x, p[1].y, p[2].x, p[2].y)
 		end
 
 
 		--draws the starting split
-		if Quick.startSplit ~= nil then
+		if self.startSplit ~= nil then
 			love.graphics.setColor(255,0,0,255)
-			love.graphics.line(Quick.startSplit[1].x, Quick.startSplit[1].y, Quick.startSplit[2].x, Quick.startSplit[2].y)
+			love.graphics.line(self.startSplit[1].x, self.startSplit[1].y, self.startSplit[2].x, self.startSplit[2].y)
 		end
 	love.graphics.setCanvas()
 end
 
 --Finds two points, one with the largest x coordinate, and one with the smallest
 --used to make the first split.
-function Quick.biggestXPoints(pointList)
+function Quick:biggestXPoints(pointList)
 	local goodPoints = {}
 
 	for _,p in pairs(pointList) do
@@ -71,7 +112,7 @@ function Quick.biggestXPoints(pointList)
 end
 
 --Computes the distance between a point and a line
-function Quick.distanceToLine(line, point)
+function Quick:distanceToLine(line, point)
 	BA = line[2] - line[1]
 	AC = point - line[1]
 
@@ -82,13 +123,13 @@ end
 
 --Gets the third point for our triangle split.
 --this point will be the one that's farthest away from the line
-function Quick.getTriPoint(pointList, line)
+function Quick:getTriPoint(pointList, line)
 	local longestDist
 	local point
 
 	for _,p in pairs(pointList) do
-		if Quick.excludedPoints[tostring(p)] == nil then
-			local dist = Quick.distanceToLine(line, p)
+		if self.excludedPoints[tostring(p)] == nil then
+			local dist = self:distanceToLine(line, p)
 			if longestDist == nill or dist > longestDist then
 				longestDist = dist
 				point = p
@@ -111,11 +152,11 @@ end
 	but it works.
 
 	Source: http://stackoverflow.com/questions/2049582/how-to-determine-a-point-in-a-triangle ]]
-function Quick.pointsInTri(pointList, p0, p1, p2)
+function Quick:pointsInTri(pointList, p0, p1, p2)
 	local GoodPoints = {}
 	local BadPoints = {}
 	for _,p in pairs(pointList) do
-		if Quick.excludedPoints[tostring(p)] == nil then
+		if self.excludedPoints[tostring(p)] == nil then
 			A = 1/2 * (-p1.y * p2.x + p0.y * (-p1.x + p2.x) + p0.x * (p1.y - p2.y) + p1.x * p2.y)
 			sign = -1
 			if A >= 0 then
@@ -124,10 +165,10 @@ function Quick.pointsInTri(pointList, p0, p1, p2)
 			s = (p0.y * p2.x - p0.x * p2.y + (p2.y - p0.y) * p.x + (p0.x - p2.x) * p.y) * sign
 			t = (p0.x * p1.y - p0.y * p1.x + (p0.y - p1.y) * p.x + (p1.x - p0.x) * p.y) * sign
 
-			if s > 0 and t > 0 and (s + t) < 2 * A * sign then
+			if (s > 0 and t > 0 and (s + t) < 2 * A * sign) or self:pointOnTriSide(p0, p1, p2, p) then
 				BadPoints[#BadPoints + 1] = p --in triangle
 				--this excludes any points found inside the triangle form further searches
-				Quick.excludedPoints[tostring(p)] = 1
+				self.excludedPoints[tostring(p)] = 1
 			else
 				GoodPoints[#GoodPoints + 1] = p
 			end
@@ -136,14 +177,23 @@ function Quick.pointsInTri(pointList, p0, p1, p2)
 	return GoodPoints, BadPoints
 end
 
+--Checks is the point is directly ON the one of the sides of the triangle.
+--Since we have already determined this point to not be the farthest from the line, that means it's safe
+--to discard it, if it lies on the same line.
+function Quick:pointOnTriSide(p0, p1, p2, point)
+	if relativeToLine(p0, p1, point) == 0 or relativeToLine(p0, p2, point) == 0 or relativeToLine(p1, p2, point) == 0 then
+		return true
+	else return false end
+end
+
 --Used to find all the points that we will be sending to the next iteration of 
 --the algorithim.
-function Quick.getNewPoints(pointList, line, side)
+function Quick:getNewPoints(pointList, line, side)
 	local newPoints = {}
 	local badPoints = {}
 
 	for _,p in pairs(pointList) do
-		if Quick.excludedPoints[tostring(p)] == nil then
+		if self.excludedPoints[tostring(p)] == nil then
 			local check = relativeToLine(line[1], line[2], p)
 			if  (side == 1  and check < 0) or (side == 2 and check > 0) then
 				newPoints[#newPoints + 1] = p
@@ -156,96 +206,118 @@ function Quick.getNewPoints(pointList, line, side)
 	return newPoints, badPoints
 end
 
-function Quick.onLoad()
-    Quick.canvas = love.graphics.newCanvas(width/2, height)  
+function Quick:doTiming()
+	local starttimes = {}
+	local endtimes = {}
+	for l = 1, 2 do
+		self:Reset()
+		starttimes[#starttimes + 1] = socket.gettime()
+
+		self:findHull()
+		endtimes[#endtimes + 1] = socket.gettime() - starttimes[#starttimes]
+		--coroutine.yield()
+	end
+
+	local avgQuickTime = 0
+	for _,l in pairs(endtimes) do
+		avgQuickTime = avgQuickTime + l
+	end
+	avgQuickTime = avgQuickTime / #endtimes
+
+	print("Quick@"..tostring(self.num)..": "..tostring(avgQuickTime))
+	self:ClearAll()
+	coroutine.yield()
 end
 
-
 --wrapper function for the recursive one, inits all the appropriate stuff
-function Quick.findHull() 
+function Quick:findHull() 
+	
 	--this table is needed because we can't pass a number by reference in lua
 	--plus it helps wrap the direction nicely as well.
 	local index = {}
 	index[1] = 0
 
 	--do the first split and exclude it's points from further search
-	local startLine = Quick.biggestXPoints(points)
-	Quick.startSplit = startLine
-	Quick.excludedPoints[tostring(startLine[1])] = 1
-	Quick.excludedPoints[tostring(startLine[2])] = 1
+	local startLine = self:biggestXPoints(self.points)
+
+	self.startSplit = startLine
+	self.excludedPoints[tostring(startLine[1])] = 1
+	self.excludedPoints[tostring(startLine[2])] = 1
 
 	--figure out which points need to be sent to which recursive call
-	local above, below = Quick.getNewPoints(points, startLine, 1)
+	local above, below = self:getNewPoints(self.points, startLine, 1)
 
 	index["side"] = 1
-	Quick.recCompute(above, startLine, index)
+	self:recCompute(above, startLine, index)
 	index["side"] = 2
-	Quick.recCompute(below, startLine, index)
+	self:recCompute(below, startLine, index)
 
-	coroutine.yield()
+	--coroutine.yield()
 end
 
 
-function Quick.recCompute(pointList, line, index)
+function Quick:recCompute(pointList, line, index)
 	--Exclude the points on the line form future searches.
-	Quick.excludedPoints[tostring(line[1])] = 1
-	Quick.excludedPoints[tostring(line[2])] = 1
+	self.excludedPoints[tostring(line[1])] = 1
+	self.excludedPoints[tostring(line[2])] = 1
 
 	--find the "peak" of the triangle
-	local point = Quick.getTriPoint(pointList, line)
+	local point = self:getTriPoint(pointList, line)
 	
 	--if there isn't one, we're on the hull right now.
 	if point == nil then 
-		Quick.finalHull[index[1]] = line
+		self.finalHull[index[1]] = line
 		index[1] = index[1] + 1
-		coroutine.yield()
+		--coroutine.yield()
 		return
 	end
-	--otherwise exlcude it as well
-	Quick.excludedPoints[tostring(point)] = 1
 
+
+	--this next block just ensures that the lines representing the triangles
+	--aren't drawn more than once.
+	self.visitedPoints[#self.visitedPoints + 1] = point
+	if self.excludedCheckLines[tostring(line[1]).."|"..tostring(line[2])] == nil then
+		self.checkLines[#self.checkLines + 1] = line
+		self.excludedCheckLines[tostring(line[1]).."|"..tostring(line[2])] = 1
+	end
+	if self.excludedCheckLines[tostring(line[1]).."|"..tostring(point)] == nil then
+		self.checkLines[#self.checkLines + 1] = {line[1], point}
+		self.excludedCheckLines[tostring(line[1]).."|"..tostring(point)] = 1
+	end
+	if self.excludedCheckLines[tostring(point).."|"..tostring(line[2])] == nil then
+		self.checkLines[#self.checkLines + 1] = {point, line[2]}
+		self.excludedCheckLines[tostring(point).."|"..tostring(line[2])] = 1
+	end
+
+	--otherwise exlcude it as well
+	self.excludedPoints[tostring(point)] = 1
+	--coroutine.yield()
 	--find all the points NOT inside the triangle  we just made
-	local good = Quick.pointsInTri(pointList, line[1], line[2], point)
-	coroutine.yield()
+	local good = self:pointsInTri(pointList, line[1], line[2], point)
+	--coroutine.yield()
 
 	--if there are any,
 	if #good ~= 0 then
 		--figure out which points of need to be sent to which recursive call
 		local above, below
 		if index["side"] == 1 then
-			above, below = Quick.getNewPoints(good, {line[1], point}, 1)
+			above, below = self:getNewPoints(good, {line[1], point}, 1)
 		else
-			above, below = Quick.getNewPoints(good, {line[1], point}, 2)
+			above, below = self:getNewPoints(good, {line[1], point}, 2)
 		end
 
-		--this next block jsut ensures that the lines representing the triangles
-		--aren't drawn more than once.
-		coroutine.yield()
-		Quick.visitedPoints[#Quick.visitedPoints + 1] = point
-		if Quick.excludedCheckLines[tostring(line[1]).."|"..tostring(line[2])] == nil then
-			Quick.checkLines[#Quick.checkLines + 1] = line
-			Quick.excludedCheckLines[tostring(line[1]).."|"..tostring(line[2])] = 1
-		end
-		if Quick.excludedCheckLines[tostring(line[1]).."|"..tostring(point)] == nil then
-			Quick.checkLines[#Quick.checkLines + 1] = {line[1], point}
-			Quick.excludedCheckLines[tostring(line[1]).."|"..tostring(point)] = 1
-		end
-		if Quick.excludedCheckLines[tostring(point).."|"..tostring(line[2])] == nil then
-			Quick.checkLines[#Quick.checkLines + 1] = {point, line[2]}
-			Quick.excludedCheckLines[tostring(point).."|"..tostring(line[2])] = 1
-		end
-
-		--recurse to the two new sides of the triangle
-		coroutine.yield()
-		Quick.recCompute(above, {line[1], point}, index)
-		Quick.recCompute(below, {point, line[2]}, index)
+		--coroutine.yield()
+		self:recCompute(above, {line[1], point}, index)
+		self:recCompute(below, {point, line[2]}, index)
 	else
 		--if there aren't any points outside fo teh triangle, that means the
 		--two sides of it make up the hull.
-		Quick.finalHull[index[1]] = {line[1], point}
-		Quick.finalHull[index[1] + 1] = {point, line[2]}
+		self.finalHull[index[1]] = {line[1], point}
+		self.finalHull[index[1] + 1] = {point, line[2]}
 		index[1] = index[1] + 2
-		coroutine.yield()
+		--coroutine.yield()
+	--sleep(1)
+
 	end
 
 end

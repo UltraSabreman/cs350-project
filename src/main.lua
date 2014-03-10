@@ -8,28 +8,42 @@ function sleep(sec)
 end
 
 args = {...}
-points = {}
+
 height = love.window.getHeight()
 width  = love.window.getWidth()
 
-local numOfPoints = tonumber(args[0]) or 100
-local BruteCoroutine, QuickCoroutine
+local numOfPoints = tonumber(args[0]) or 500
+local numOfSteps = 20
+local BruteCos = {}
+local QuickCos = {}
 
 
 function love.load() 
-	Brute.onLoad()
-	Quick.onLoad()
+	print("Starting "..tostring(numOfSteps).." tests.")
+	for i = 1, numOfSteps do
+		local ind = tostring(i)
+		numOfPoints = i * 500
+		local points = randPoints()
 
-	circlePoints(190)
-	--randPoints()
+		BruteCos["obj"..ind] = Brute.new(points, numOfPoints)
+		BruteCos["co"..ind] = coroutine.create(function() BruteCos["obj"..ind]:doTiming() end)
 
-	BruteCoroutine = coroutine.create(Brute.findHull)
-	QuickCoroutine = coroutine.create(Quick.findHull)
+
+		QuickCos["obj"..ind] = Quick.new(points, numOfPoints)
+		QuickCos["co"..ind] = coroutine.create(function() QuickCos["obj"..ind]:doTiming() end)
+	end
 end
 
 function love.update()
-	if coroutine.status(BruteCoroutine) ~= "dead" then coroutine.resume(BruteCoroutine)	end
-	if coroutine.status(QuickCoroutine) ~= "dead" then coroutine.resume(QuickCoroutine)	end
+	for i = 1, numOfSteps do
+		local ind = tostring(i)
+		if BruteCos["obj"..ind] ~= nil and coroutine.status(BruteCos["co"..ind]) ~= "dead" then
+			coroutine.resume(BruteCos["co"..ind])
+		end
+		if QuickCos["obj"..ind] ~= nil and coroutine.status(QuickCos["co"..ind]) ~= "dead" then
+			coroutine.resume(QuickCos["co"..ind])
+		end
+	end
 end
 
 function love.draw()
@@ -39,8 +53,8 @@ function love.draw()
 	love.graphics.setLineWidth(1)
 	love.graphics.setColor(255,255,255,255)
 
-	Brute.Draw()
-	Quick.Draw()
+	--Brute.Draw()
+	--Quick.Draw()
 
 	love.graphics.setColor(255,255,255,255)
 	love.graphics.setBlendMode('premultiplied')
@@ -66,12 +80,15 @@ end
 
 --generates the points in a random fasion
 function randPoints() 
-	math.randomseed(os.time())
+	local t = os.time()
+	math.randomseed(t)
+	local points = {}
 	for i = 1, numOfPoints do
-		temp = Vector.new(math.random(0, (width / 2) - 10), math.random(0, height - 10))
+		temp = Vector.new(math.random(25, (width / 2) - 25), math.random(25, height - 25))
 
 		points[#points + 1] = temp
 	end
+	return points
 end
 
 --Checks wich side of the line our point is on.

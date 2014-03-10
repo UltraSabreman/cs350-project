@@ -38,13 +38,15 @@ function Vector:print()
 	print(tostring(self))
 end
 
+
+
+
 function Vector.new(x, y)
   local self = setmetatable({}, Vector)
   self.x = x
   self.y = y
   return self
 end
-
 
 function Vector.__tostring(vec)
 	return "("..tostring(vec.x)..", "..tostring(vec.y)..")"

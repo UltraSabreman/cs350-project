@@ -4,6 +4,18 @@
 		"selected_items":
 		[
 			[
+				"c",
+				"canvas"
+			],
+			[
+				"dr",
+				"draw"
+			],
+			[
+				"setC",
+				"setCanvas"
+			],
+			[
 				"tri",
 				"triLines"
 			],
@@ -108,35 +120,11 @@
 	"buffers":
 	[
 		{
-			"file": "src/main.lua",
+			"file": "/C/Users/Andrey/Desktop/tm_routes.kml.xml",
 			"settings":
 			{
-				"buffer_size": 1594,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/BruteForce.lua",
-			"settings":
-			{
-				"buffer_size": 2891,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/QuickHull.lua",
-			"settings":
-			{
-				"buffer_size": 7951,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "src/vector.lua",
-			"settings":
-			{
-				"buffer_size": 1935,
-				"line_ending": "Windows"
+				"buffer_size": 9922677,
+				"line_ending": "Unix"
 			}
 		}
 	],
@@ -167,8 +155,13 @@
 	},
 	"file_history":
 	[
-		"/C/Users/Andrey/Google Drive/2014 - Winter/CS 350/project/cs350 project/project.sublime-project",
+		"/C/Users/Andrey/Google Drive/2014 - Winter/CS 350/project/cs350 project/src/BruteForce.lua",
+		"/C/Users/Andrey/Google Drive/2014 - Winter/CS 350/project/cs350 project/src/main.lua",
+		"/C/Users/Andrey/Google Drive/2014 - Winter/CS 350/project/cs350 project/src/vector.lua",
 		"/C/Users/Andrey/Google Drive/2014 - Winter/CS 350/project/cs350 project/src/QuickHull.lua",
+		"/C/Fast Games/SteamApps/common/GarrysMod/garrysmod/data/expression2/missile_launcher_propcore.txt",
+		"/C/Users/Andrey/Desktop/New Text Document.txt",
+		"/C/Users/Andrey/Google Drive/2014 - Winter/CS 350/project/cs350 project/project.sublime-project",
 		"/C/Users/Andrey/AppData/Roaming/Sublime Text 3/Packages/User/project.sublime-build",
 		"/C/Users/Andrey/Desktop/cs350project/src/main.lua",
 		"/C/Users/Andrey/AppData/Roaming/Sublime Text 3/Packages/Theme - DefaultPlus/DefaultPlus.sublime-theme",
@@ -188,7 +181,6 @@
 		"/C/Users/Andrey/Desktop/Homework/lab6/testif",
 		"/C/Users/Andrey/Desktop/Homework/lab6/If.jj",
 		"/C/Users/Andrey/Desktop/Homework/lab6/sol/SumAst.java",
-		"/C/Users/Andrey/Desktop/New Text Document.txt",
 		"/C/Users/Andrey/Desktop/Homework/hw4/mjParser0.jj",
 		"/C/Users/Andrey/Desktop/Homework/lab6/sol/Expr4.jj",
 		"/C/Users/Andrey/Desktop/Homework/lab6/Expr3.jj",
@@ -290,11 +282,7 @@
 		"/C/Users/Andrey/Desktop/treefartm stuff",
 		"/C/Users/Andrey/Desktop/cs321hw1/hw1-warmup.txt",
 		"/C/Users/Andrey/Desktop/jghj.py",
-		"/C/Users/Andrey/Desktop/cs321hw1/Andrey_Byelogurov-hw1.txt",
-		"/C/Users/Andrey/Desktop/cs321hw1/minitour/21/lexer/MiniTokens.java",
-		"/C/Users/Andrey/Desktop/cs321hw1/minitour/21/lexer/MiniLexer.java",
-		"/C/Users/Andrey/Desktop/cs321hw1/minitour/21/parser/MiniParser.java",
-		"/C/Users/Andrey/Desktop/cs321hw1/minitour/21/compiler/Lexer.java"
+		"/C/Users/Andrey/Desktop/cs321hw1/Andrey_Byelogurov-hw1.txt"
 	],
 	"find":
 	{
@@ -351,117 +339,32 @@
 			[
 				{
 					"buffer": 0,
-					"file": "src/main.lua",
+					"file": "/C/Users/Andrey/Desktop/tm_routes.kml.xml",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1594,
+						"buffer_size": 9922677,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								667,
-								667
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Lua/Lua.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"syntax": "Packages/XML/XML.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "src/BruteForce.lua",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2891,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1460,
-								1460
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Lua/Lua.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "src/QuickHull.lua",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 7951,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								477,
-								477
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Lua/Lua.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "src/vector.lua",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1935,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								487,
-								487
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Lua/Lua.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
 					"type": "text"
 				}
 			]
