@@ -3,58 +3,40 @@ require "QuickHull"
 require "socket"
 require "Vector"
 
-function sleep(sec)
-    socket.select(nil, nil, sec)
-end
-
-args = {...}
-
 height = love.window.getHeight()
 width  = love.window.getWidth()
 
-local numOfPoints = tonumber(args[0]) or 500
+local numOfPoints = 500
 local numOfSteps = 20
-local BruteCos = {}
-local QuickCos = {}
-
 
 function love.load() 
 	print("Starting "..tostring(numOfSteps).." tests.")
 	for i = 1, numOfSteps do
+		collectgarbage()
 		local ind = tostring(i)
 		numOfPoints = i * 500
-		local points = randPoints()
+		local points = randPoints() --circlePoints(150)
 
-		BruteCos["obj"..ind] = Brute.new(points, numOfPoints)
-		BruteCos["co"..ind] = coroutine.create(function() BruteCos["obj"..ind]:doTiming() end)
-
-
-		QuickCos["obj"..ind] = Quick.new(points, numOfPoints)
-		QuickCos["co"..ind] = coroutine.create(function() QuickCos["obj"..ind]:doTiming() end)
+		Brute.new(points, numOfPoints):doTiming()
+		Quick.new(points, numOfPoints):doTiming()
 	end
 end
 
 function love.update()
-	for i = 1, numOfSteps do
-		local ind = tostring(i)
-		if BruteCos["obj"..ind] ~= nil and coroutine.status(BruteCos["co"..ind]) ~= "dead" then
-			coroutine.resume(BruteCos["co"..ind])
-		end
-		if QuickCos["obj"..ind] ~= nil and coroutine.status(QuickCos["co"..ind]) ~= "dead" then
-			coroutine.resume(QuickCos["co"..ind])
-		end
-	end
+
 end
 
 function love.draw()
+	--[[
+	--used during testing to help debug.
 	--draws the points
 	love.graphics.setBlendMode('alpha')
 	love.graphics.setLineStyle("smooth")
 	love.graphics.setLineWidth(1)
 	love.graphics.setColor(255,255,255,255)
 
-	--Brute.Draw()
-	--Quick.Draw()
+	Brute.Draw()
+	Quick.Draw()
 
 	love.graphics.setColor(255,255,255,255)
 	love.graphics.setBlendMode('premultiplied')
@@ -63,12 +45,14 @@ function love.draw()
 
 	love.graphics.setBlendMode('alpha')
 	love.graphics.setColor(255,255,255,255)
-	love.graphics.line(width/2, 0, width/2, height)
+	love.graphics.line(width/2, 0, width/2, height)]]
 end
+
 --generates the points in a perfect circle
 function circlePoints(radius)
 	local angStep = (math.pi * 2) / numOfPoints
 	local curAng = angStep
+	local points = {}
 	for i = 1, numOfPoints do
 		local x = ((width - 10) / 4) + math.sin(curAng) * radius
 		local y = ((height - 10) / 2) + math.cos(curAng) * radius
@@ -76,6 +60,7 @@ function circlePoints(radius)
 
 		points[#points + 1] = Vector.new(x, y)
 	end
+	return points
 end
 
 --generates the points in a random fasion

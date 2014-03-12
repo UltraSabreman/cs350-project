@@ -209,15 +209,17 @@ end
 function Quick:doTiming()
 	local starttimes = {}
 	local endtimes = {}
-	for l = 1, 2 do
+
+	--do 4 timing runs
+	for l = 1, 4 do
 		self:Reset()
 		starttimes[#starttimes + 1] = socket.gettime()
 
 		self:findHull()
 		endtimes[#endtimes + 1] = socket.gettime() - starttimes[#starttimes]
-		--coroutine.yield()
 	end
 
+	--avarage times
 	local avgQuickTime = 0
 	for _,l in pairs(endtimes) do
 		avgQuickTime = avgQuickTime + l
@@ -226,98 +228,65 @@ function Quick:doTiming()
 
 	print("Quick@"..tostring(self.num)..": "..tostring(avgQuickTime))
 	self:ClearAll()
-	coroutine.yield()
 end
 
---wrapper function for the recursive one, inits all the appropriate stuff
 function Quick:findHull() 
-	
-	--this table is needed because we can't pass a number by reference in lua
-	--plus it helps wrap the direction nicely as well.
-	local index = {}
-	index[1] = 0
-
 	--do the first split and exclude it's points from further search
 	local startLine = self:biggestXPoints(self.points)
 
-	self.startSplit = startLine
 	self.excludedPoints[tostring(startLine[1])] = 1
 	self.excludedPoints[tostring(startLine[2])] = 1
 
 	--figure out which points need to be sent to which recursive call
 	local above, below = self:getNewPoints(self.points, startLine, 1)
 
-	index["side"] = 1
-	self:recCompute(above, startLine, index)
-	index["side"] = 2
-	self:recCompute(below, startLine, index)
-
-	--coroutine.yield()
+	self:recCompute(above, startLine, 1)
+	self:recCompute(below, startLine, 2)
 end
 
 
-function Quick:recCompute(pointList, line, index)
+function Quick:recCompute(pointList, line, side)
 	--Exclude the points on the line form future searches.
 	self.excludedPoints[tostring(line[1])] = 1
 	self.excludedPoints[tostring(line[2])] = 1
 
 	--find the "peak" of the triangle
 	local point = self:getTriPoint(pointList, line)
-	
+
 	--if there isn't one, we're on the hull right now.
 	if point == nil then 
-		self.finalHull[index[1]] = line
-		index[1] = index[1] + 1
-		--coroutine.yield()
+		self.finalHull[#self.finalHull + 1] = line
 		return
 	end
 
-
 	--this next block just ensures that the lines representing the triangles
 	--aren't drawn more than once.
-	self.visitedPoints[#self.visitedPoints + 1] = point
 	if self.excludedCheckLines[tostring(line[1]).."|"..tostring(line[2])] == nil then
-		self.checkLines[#self.checkLines + 1] = line
 		self.excludedCheckLines[tostring(line[1]).."|"..tostring(line[2])] = 1
 	end
 	if self.excludedCheckLines[tostring(line[1]).."|"..tostring(point)] == nil then
-		self.checkLines[#self.checkLines + 1] = {line[1], point}
 		self.excludedCheckLines[tostring(line[1]).."|"..tostring(point)] = 1
 	end
 	if self.excludedCheckLines[tostring(point).."|"..tostring(line[2])] == nil then
-		self.checkLines[#self.checkLines + 1] = {point, line[2]}
 		self.excludedCheckLines[tostring(point).."|"..tostring(line[2])] = 1
 	end
 
 	--otherwise exlcude it as well
 	self.excludedPoints[tostring(point)] = 1
-	--coroutine.yield()
 	--find all the points NOT inside the triangle  we just made
 	local good = self:pointsInTri(pointList, line[1], line[2], point)
-	--coroutine.yield()
 
 	--if there are any,
 	if #good ~= 0 then
 		--figure out which points of need to be sent to which recursive call
-		local above, below
-		if index["side"] == 1 then
-			above, below = self:getNewPoints(good, {line[1], point}, 1)
-		else
-			above, below = self:getNewPoints(good, {line[1], point}, 2)
-		end
+		local above, below = self:getNewPoints(good, {line[1], point}, side)
 
-		--coroutine.yield()
 		self:recCompute(above, {line[1], point}, index)
 		self:recCompute(below, {point, line[2]}, index)
 	else
 		--if there aren't any points outside fo teh triangle, that means the
 		--two sides of it make up the hull.
-		self.finalHull[index[1]] = {line[1], point}
-		self.finalHull[index[1] + 1] = {point, line[2]}
-		index[1] = index[1] + 2
-		--coroutine.yield()
-	--sleep(1)
-
+		self.finalHull[#self.finalHull + 1] = {line[1], point}
+		self.finalHull[#self.finalHull + 1] = {point, line[2]}
 	end
-
 end
